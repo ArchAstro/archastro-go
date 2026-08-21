@@ -39896,6 +39896,104 @@
         ]
       }
     },
+    "/api/v1/intern/plugins/invoke": {
+      "post": {
+        "description": "Invokes a Platform-owned implementation for an authenticated Intern site.\nThe trusted gateway supplies the site's persisted installation descriptor;\nPlatform validates it against a closed plugin catalog before dispatching.\nPlugin keys cannot select an origin, URL, module, or arbitrary function.\n",
+        "operationId": "post_api_v1_intern_plugins_invoke",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "example": {
+                  "input": {},
+                  "installation": {
+                    "binding": "string",
+                    "config": {},
+                    "plugin": "string",
+                    "protocol_version": 1
+                  },
+                  "operation": "string"
+                },
+                "properties": {
+                  "input": {
+                    "default": {},
+                    "example": {},
+                    "type": "object"
+                  },
+                  "installation": {
+                    "example": {
+                      "binding": "string",
+                      "config": {},
+                      "plugin": "string",
+                      "protocol_version": 1
+                    },
+                    "properties": {
+                      "binding": {
+                        "example": "string",
+                        "type": "string"
+                      },
+                      "config": {
+                        "example": {},
+                        "type": "object"
+                      },
+                      "plugin": {
+                        "example": "string",
+                        "type": "string"
+                      },
+                      "protocol_version": {
+                        "example": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "binding",
+                      "plugin",
+                      "protocol_version",
+                      "config"
+                    ],
+                    "type": "object"
+                  },
+                  "operation": {
+                    "example": "string",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "installation",
+                  "operation"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Plugin-defined result projected by the registered Platform implementation."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "422": {
+            "description": "Invalid installation, operation, or input"
+          }
+        },
+        "summary": "Invoke an installed Intern browser plugin",
+        "x-auth": [
+          "publishable_key",
+          "bearer"
+        ]
+      }
+    },
     "/api/v1/invites/accept": {
       "post": {
         "description": "Accepts an invite on behalf of the authenticated user and adds them to the\nassociated team or thread. The invite `key` is passed in the request body\nrather than the URL so it never appears in access logs, `Referer` headers,\nor error-reporter URL captures.\n\nThis endpoint requires an authenticated end-user session. S2S secret-key\ntokens and unauthenticated requests are rejected with `401`. If the\nauthenticated user is already a member of the invite's target, the request\nreturns `409`. Both per-IP and per-user rate limits apply; exceeding either\nreturns `429`.\n",
@@ -70858,6 +70956,8 @@
               "schema": {
                 "example": {
                   "alias": "string",
+                  "clear_full_name": true,
+                  "clear_profile_picture": true,
                   "full_name": "Example Name",
                   "metadata": {
                     "key": "value"
@@ -70873,6 +70973,16 @@
                     "description": "Short display alias shown in place of the full name in compact UI contexts.",
                     "example": "string",
                     "type": "string"
+                  },
+                  "clear_full_name": {
+                    "description": "Set to true to clear the optional display name. Cannot be combined with full_name.",
+                    "example": true,
+                    "type": "boolean"
+                  },
+                  "clear_profile_picture": {
+                    "description": "Set to true to remove the current profile picture. Cannot be combined with profile_picture.",
+                    "example": true,
+                    "type": "boolean"
                   },
                   "full_name": {
                     "description": "Updated display name for the user.",
