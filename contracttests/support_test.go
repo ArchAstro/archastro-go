@@ -216,12 +216,7 @@ func startPrism() error {
 		return fmt.Errorf("prism bin not found at %s — set PRISM_BIN or run 'npm ci' in the repo root", bin)
 	}
 
-	cmd := exec.Command(bin, //nolint:gosec // path is repo-local or operator-supplied
-		"mock", specPath(),
-		"--port", prismPort(),
-		"--host", "127.0.0.1",
-		"--dynamic",
-	)
+	cmd := exec.Command(bin, prismArgs()...) //nolint:gosec // path is repo-local or operator-supplied
 	cmd.Stdout = nil
 	cmd.Stderr = nil
 	if err := cmd.Start(); err != nil {
@@ -237,6 +232,17 @@ func startPrism() error {
 		time.Sleep(300 * time.Millisecond)
 	}
 	return fmt.Errorf("prism did not start on port %s within 60s", prismPort())
+}
+
+func prismArgs() []string {
+	// Static responses keep shape-contract tests deterministic. Prism's dynamic
+	// mode delegates nested response examples to json-schema-faker, which can
+	// crash while expanding valid array schemas such as Activity Feed entries.
+	return []string{
+		"mock", specPath(),
+		"--port", prismPort(),
+		"--host", "127.0.0.1",
+	}
 }
 
 func prismAnswers() bool {
