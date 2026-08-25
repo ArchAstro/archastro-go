@@ -49465,6 +49465,9 @@
           "404": {
             "description": "Task not found"
           },
+          "409": {
+            "description": "Task changed since it was read"
+          },
           "422": {
             "description": "Invalid parameters"
           }
@@ -74211,6 +74214,124 @@
           }
         },
         "summary": "List a user's artifacts",
+        "x-auth": [
+          "publishable_key",
+          "bearer"
+        ]
+      }
+    },
+    "/api/v1/users/{user}/integrations/{provider}/access_token": {
+      "get": {
+        "description": "Returns a valid GitHub access token for one integration owned by the\nauthenticated user. Expired tokens are refreshed before the response is\nreturned.\n\nThis endpoint accepts the user's own bearer token, or the app's secret key\nacting server-side for one of its users. Developer, agent, team, and\ncross-user viewers cannot retrieve the credential. Responses are marked\n`Cache-Control: no-store`.\n",
+        "operationId": "get_api_v1_users__user_integrations__provider_access_token",
+        "parameters": [
+          {
+            "description": "User ID (`usr_...`). Must identify the authenticated user.",
+            "example": "string",
+            "in": "path",
+            "name": "user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Integration provider. Only `github` is accepted.",
+            "example": "string",
+            "in": "path",
+            "name": "provider",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "The valid GitHub credential and its integration metadata.",
+                  "example": {
+                    "access_token": "string",
+                    "expires_at": "2024-01-01T00:00:00Z",
+                    "integration": "string",
+                    "provider": "string",
+                    "scopes": [
+                      "string"
+                    ],
+                    "workspace_key": "string"
+                  },
+                  "properties": {
+                    "access_token": {
+                      "description": "GitHub access token. Treat this value as a secret.",
+                      "example": "string",
+                      "type": "string"
+                    },
+                    "expires_at": {
+                      "description": "Access-token expiry, or null for non-expiring tokens.",
+                      "example": "2024-01-01T00:00:00Z",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "integration": {
+                      "description": "Integration ID (`int_...`).",
+                      "example": "string",
+                      "type": "string"
+                    },
+                    "provider": {
+                      "description": "Always `github`.",
+                      "example": "string",
+                      "type": "string"
+                    },
+                    "scopes": {
+                      "description": "Recorded GitHub OAuth scopes.",
+                      "example": [
+                        "string"
+                      ],
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "workspace_key": {
+                      "description": "GitHub login associated with the credential.",
+                      "example": "string",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "access_token",
+                    "integration",
+                    "provider",
+                    "scopes"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found; OAuth provider not found"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Invalid parameters"
+          },
+          "502": {
+            "description": "Service unavailable"
+          }
+        },
+        "summary": "Retrieve a GitHub integration access token",
         "x-auth": [
           "publishable_key",
           "bearer"
